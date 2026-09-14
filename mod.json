@@ -16,6 +16,10 @@
 		"community": "https://discord.gg/Wk6QcKdXck",
 		"source": "https://github.com/NeonGD1667/GeoTube"
 	},
+	"issues": {
+		"info": "Report issues on the GeoTube GitHub repository",
+		"url": "https://github.com/NeonGD1667/GeoTube/issues"
+	},
     "dependencies": {
         "geode.node-ids": {
             "version": ">=v1.23.3",
