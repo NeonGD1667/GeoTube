@@ -1,73 +1,146 @@
-/// thằng này code ngu vãi
+/// hiện tại chỉ là mẫu , sau này add sau
 #ifdef _WIN32
 
 #include "WebView.hpp"
 
-#include <windows.h>
-#include <wrl.h>
+#include <Windows.h>
 #include <WebView2.h>
+#include <wrl.h>
 
 #include <string>
 
+using Microsoft::WRL::Callback;
 using Microsoft::WRL::ComPtr;
 
 namespace geotube::webview {
 
     static HWND s_window = nullptr;
+
     static ComPtr<ICoreWebView2Environment> s_environment;
     static ComPtr<ICoreWebView2Controller> s_controller;
     static ComPtr<ICoreWebView2> s_webview;
 
     static bool s_visible = false;
 
+
+    static HWND findGeometryDashWindow() {
+        struct WindowData {
+            DWORD processID;
+            HWND window;
+        };
+
+        WindowData data {
+            GetCurrentProcessId(),
+            nullptr
+        };
+
+        EnumWindows(
+            [](HWND hwnd, LPARAM lParam) -> BOOL {
+                auto* data =
+                    reinterpret_cast<WindowData*>(lParam);
+
+                DWORD windowProcessID = 0;
+
+                GetWindowThreadProcessId(
+                    hwnd,
+                    &windowProcessID
+                );
+
+                if (windowProcessID != data->processID)
+                    return TRUE;
+
+                if (!IsWindowVisible(hwnd))
+                    return TRUE;
+
+                if (GetWindow(hwnd, GW_OWNER) != nullptr)
+                    return TRUE;
+
+                data->window = hwnd;
+
+                return FALSE;
+            },
+            reinterpret_cast<LPARAM>(&data)
+        );
+
+        return data.window;
+    }
+
+
+    static void updateBounds() {
+        if (!s_window || !s_controller)
+            return;
+
+        RECT rect {};
+        GetClientRect(s_window, &rect);
+
+        s_controller->put_Bounds(rect);
+    }
+
+
     void create() {
         if (s_webview)
             return;
 
-        s_window = GetActiveWindow();
+        s_window = findGeometryDashWindow();
 
         if (!s_window)
             return;
 
-        CreateCoreWebView2EnvironmentWithOptions(
-            nullptr,
-            nullptr,
-            nullptr,
-            Microsoft::WRL::Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(
-                [](HRESULT result, ICoreWebView2Environment* environment) -> HRESULT {
-                    if (FAILED(result) || !environment)
-                        return result;
+        HRESULT result =
+            CreateCoreWebView2EnvironmentWithOptions(
+                nullptr,
+                nullptr,
+                nullptr,
+                Callback<
+                    ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler
+                >(
+                    [](HRESULT result,
+                       ICoreWebView2Environment* environment) -> HRESULT {
 
-                    s_environment = environment;
+                        if (FAILED(result) || !environment)
+                            return result;
 
-                    environment->CreateCoreWebView2Controller(
-                        s_window,
-                        Microsoft::WRL::Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
-                            [](HRESULT result, ICoreWebView2Controller* controller) -> HRESULT {
-                                if (FAILED(result) || !controller)
-                                    return result;
+                        s_environment = environment;
 
-                                s_controller = controller;
+                        return s_environment->CreateCoreWebView2Controller(
+                            s_window,
+                            Callback<
+                                ICoreWebView2CreateCoreWebView2ControllerCompletedHandler
+                            >(
+                                [](HRESULT result,
+                                   ICoreWebView2Controller* controller) -> HRESULT {
 
-                                controller->get_CoreWebView2(
-                                    &s_webview
-                                );
+                                    if (FAILED(result) || !controller)
+                                        return result;
 
-                                if (!s_webview)
-                                    return E_FAIL;
+                                    s_controller = controller;
 
-                                s_controller->put_IsVisible(FALSE);
+                                    HRESULT hr =
+                                        s_controller->get_CoreWebView2(
+                                            &s_webview
+                                        );
 
-                                return S_OK;
-                            }
-                        ).Get()
-                    );
+                                    if (FAILED(hr) || !s_webview)
+                                        return hr;
 
-                    return S_OK;
-                }
-            ).Get()
-        );
+                                    updateBounds();
+
+                                    s_controller->put_IsVisible(
+                                        s_visible ? TRUE : FALSE
+                                    );
+
+                                    return S_OK;
+                                }
+                            ).Get()
+                        );
+                    }
+                ).Get()
+            );
+
+        if (FAILED(result))
+            return;
     }
+
 
     void destroy() {
         s_webview.Reset();
@@ -78,6 +151,7 @@ namespace geotube::webview {
         s_visible = false;
     }
 
+
     void loadURL(const std::string& url) {
         if (!s_webview)
             return;
@@ -87,8 +161,11 @@ namespace geotube::webview {
             url.end()
         );
 
-        s_webview->Navigate(wideURL.c_str());
+        s_webview->Navigate(
+            wideURL.c_str()
+        );
     }
+
 
     void executeJS(const std::string& js) {
         if (!s_webview)
@@ -105,12 +182,16 @@ namespace geotube::webview {
         );
     }
 
+
     void setVisible(bool visible) {
         s_visible = visible;
 
         if (s_controller)
-            s_controller->put_IsVisible(visible ? TRUE : FALSE);
+            s_controller->put_IsVisible(
+                visible ? TRUE : FALSE
+            );
     }
+
 
     bool isVisible() {
         return s_visible;
