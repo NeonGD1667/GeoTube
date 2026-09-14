@@ -1,33 +1,61 @@
+/// tạm thời như này
 #include <Geode/Geode.hpp>
 
 using namespace geode::prelude;
 
+#include "webview/WebView.hpp"
+
 #include <Geode/modify/MenuLayer.hpp>
-class $modify(MyMenuLayer, MenuLayer) {
-	bool init() {
-		if (!MenuLayer::init()) {
-			return false;
-		}
 
-		log::debug("Hello from my MenuLayer::init hook! This layer has {} children.", this->getChildrenCount());
+$on_mod(Loaded) {
+    log::info("GeoTube loaded!");
 
-		auto myButton = CCMenuItemSpriteExtra::create(
-			CCSprite::createWithSpriteFrameName("GJ_likeBtn_001.png"),
-			this,
-			menu_selector(MyMenuLayer::onMyButton)
-		);
+    if (Mod::get()->getSettingValue<bool>("auto-open")) {
+        geotube::webview::create();
+    }
+}
 
-		auto menu = this->getChildByID("bottom-menu");
-		menu->addChild(myButton);
+class $modify(GeoTubeMenuLayer, MenuLayer) {
 
-		myButton->setID("my-button"_spr);
+    bool init() {
+        if (!MenuLayer::init()) {
+            return false;
+        }
 
-		menu->updateLayout();
+        auto myButton = CCMenuItemSpriteExtra::create(
+            CCSprite::createWithSpriteFrameName("GJ_editBtn_001.png"),
+            this,
+            menu_selector(GeoTubeMenuLayer::onGeoTube)
+        );
 
-		return true;
-	}
+        auto menu = this->getChildByID("bottom-menu");
 
-	void onMyButton(CCObject*) {
-		FLAlertLayer::create("Geode", "Hello from my custom mod!", "OK")->show();
-	}
+        if (!menu) {
+            log::error("GeoTube: bottom-menu not found!");
+            return true;
+        }
+
+        menu->addChild(myButton);
+
+        myButton->setID("geotube-button"_spr);
+
+        menu->updateLayout();
+
+        return true;
+    }
+
+    void onGeoTube(CCObject*) {
+#ifdef _WIN32
+        geotube::webview::create();
+        geotube::webview::loadURL("https://www.youtube.com");
+        geotube::webview::setVisible(true);
+#else
+        FLAlertLayer::create(
+            "GeoTube",
+            "GeoTube WebView is not available on this platform yet.",
+            "OK"
+        )->show();
+#endif
+    }
 };
+
