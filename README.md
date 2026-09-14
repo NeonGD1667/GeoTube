@@ -1,23 +1,52 @@
 # GeoTube
-This is where she makes a mod.
 
-<img src="logo.png" width="150" alt="the mod's logo" />
+<img src="logo.png" width="150" alt="GeoTube logo" />
 
-*Update logo.png to change your mod's icon (please)*
+**YouTube on Geometry Dash.**
 
-## Getting started
-We recommend heading over to [the getting started section on our docs](https://docs.geode-sdk.org/getting-started/) for useful info on what to do next.
+GeoTube is a Geode mod that brings a web-based YouTube experience directly into Geometry Dash.
 
-## Build instructions
-For more info, see [our docs](https://docs.geode-sdk.org/getting-started/create-mod#build)
+> 🚧 **GeoTube is currently in alpha development.**
+
+## Features
+
+* 🌐 YouTube through a native WebView
+* 🖥️ Windows — WebView2
+* 🤖 Android — Android WebView
+* 🍎 macOS / iOS — WKWebView
+* ⚙️ Configurable through Geode settings
+
+## Supported Platforms
+
+| Platform | WebView         |
+| -------- | --------------- |
+| Windows  | WebView2        |
+| Android  | Android WebView |
+| macOS    | WKWebView       |
+| iOS      | WKWebView       |
+
+## Build
+
+Make sure you have the [Geode CLI](https://github.com/geode-sdk/cli) installed.
+
 ```sh
-# Assuming you have the Geode CLI set up already
 geode build
 ```
 
-# Resources
+## Issues
+
+Found a bug or have a feature request?
+
+Please report it through the **[GitHub Issues](https://github.com/NeonGD1667/GeoTube/issues)** page.
+
+## Resources
+
 * [Geode SDK Documentation](https://docs.geode-sdk.org/)
-* [Geode SDK Source Code](https://github.com/geode-sdk/geode/)
+* [Geode SDK](https://github.com/geode-sdk/geode/)
 * [Geode CLI](https://github.com/geode-sdk/cli)
 * [Bindings](https://github.com/geode-sdk/bindings/)
-* [Dev Tools](https://github.com/geode-sdk/DevTools)
+* [DevTools](https://github.com/geode-sdk/DevTools)
+
+## License
+
+GeoTube is licensed under the **AGPL-3.0** license.
