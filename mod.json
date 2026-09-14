@@ -1,17 +1,58 @@
 {
-	"geode": "5.9.0",
-	"gd": {
-		"win": "2.2081",
-		"android": "2.2081",
-		"mac": "2.2081",
-		"ios": "2.2081"
+    "geode": "5.9.0",
+    "gd": {
+        "win": "2.2081",
+        "android": "2.2081",
+        "mac": "2.2081",
+        "ios": "2.2081"
+    },
+    "id": "homeless.geotube",
+    "name": "GeoTube",
+    "version": "v0.0.1 alpha 1",
+    "developer": "NeonGD1667",
+    "description": "Youtube On GD",
+	"tags": ["online","interface","utility"],
+	"links": {
+		"community": "https://discord.gg/Wk6QcKdXck",
+		"source": "https://github.com/NeonGD1667/GeoTube"
 	},
-	"id": "neongd1667.geotube",
-	"name": "GeoTube",
-	"version": "v0.0.1 alpha 1",
-	"developer": "NeonGD1667",
-	"description": "Youtube On GD",
-	"dependencies": {
-		"geode.node-ids": ">=v1.23.3"
-	}
+    "dependencies": {
+        "geode.node-ids": {
+            "version": ">=v1.23.3",
+            "required": true,
+            "platforms": ["win","android","ios","mac"]   
+        }
+    },
+    "settings": {
+        "enabled": {
+            "name": "Enable GeoTube",
+            "description": "Enable or disable GeoTube.",
+            "type": "bool",
+            "default": true
+        },
+        "auto-open": {
+            "name": "Auto Open",
+            "description": "Automatically open GeoTube when Geometry Dash starts.",
+            "type": "bool",
+            "default": false
+        },
+        "remember-page": {
+            "name": "Remember Page",
+            "description": "Remember the last opened page.",
+            "type": "bool",
+            "default": true
+        },
+        "hardware-acceleration": {
+            "name": "Hardware Acceleration",
+            "description": "Use hardware acceleration for the WebView.",
+            "type": "bool",
+            "default": true
+        },
+        "fullscreen": {
+            "name": "Fullscreen",
+            "description": "Open GeoTube in fullscreen mode.",
+            "type": "bool",
+            "default": false
+        }
+    }
 }
